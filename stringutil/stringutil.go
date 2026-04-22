@@ -166,3 +166,161 @@ func Reverse(s string) string {
 	}
 	return string(runes)
 }
+
+// ---------------------------------------------------------------------------
+// Case conversion (additional)
+// ---------------------------------------------------------------------------
+
+// splitWords splits a snake_case or kebab-case string into words.
+func splitWords(s string) []string {
+	s = strings.ReplaceAll(s, "-", "_")
+	return strings.Split(s, "_")
+}
+
+// capitalizeFirst returns s with the first rune uppercased.
+func capitalizeFirst(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
+
+// ToCamelCase converts a snake_case or kebab-case string to camelCase.
+//
+//	stringutil.ToCamelCase("hello_world") → "helloWorld"
+//	stringutil.ToCamelCase("my-field-name") → "myFieldName"
+func ToCamelCase(s string) string {
+	words := splitWords(s)
+	if len(words) == 0 {
+		return s
+	}
+	result := strings.Builder{}
+	for i, w := range words {
+		if w == "" {
+			continue
+		}
+		if i == 0 {
+			result.WriteString(strings.ToLower(w))
+		} else {
+			result.WriteString(capitalizeFirst(strings.ToLower(w)))
+		}
+	}
+	return result.String()
+}
+
+// ToPascalCase converts a snake_case or kebab-case string to PascalCase.
+//
+//	stringutil.ToPascalCase("hello_world") → "HelloWorld"
+//	stringutil.ToPascalCase("my-field") → "MyField"
+func ToPascalCase(s string) string {
+	words := splitWords(s)
+	result := strings.Builder{}
+	for _, w := range words {
+		if w == "" {
+			continue
+		}
+		result.WriteString(capitalizeFirst(strings.ToLower(w)))
+	}
+	return result.String()
+}
+
+// ---------------------------------------------------------------------------
+// Checks
+// ---------------------------------------------------------------------------
+
+// IsEmpty reports whether s is empty after trimming whitespace.
+//
+//	stringutil.IsEmpty("  ") → true
+//	stringutil.IsEmpty("a") → false
+func IsEmpty(s string) bool {
+	return strings.TrimSpace(s) == ""
+}
+
+// IsBlank is an alias for IsEmpty.
+func IsBlank(s string) bool {
+	return IsEmpty(s)
+}
+
+// ---------------------------------------------------------------------------
+// Splitting
+// ---------------------------------------------------------------------------
+
+// SplitTrim splits s by sep, trims whitespace from each part, and drops
+// empty strings from the result.
+//
+//	stringutil.SplitTrim("a , b ,, c", ",") → ["a", "b", "c"]
+func SplitTrim(s, sep string) []string {
+	parts := strings.Split(s, sep)
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
+}
+
+// ---------------------------------------------------------------------------
+// Padding
+// ---------------------------------------------------------------------------
+
+// PadLeft pads s on the left with padChar until the string reaches width
+// runes. Returns s unchanged if len([]rune(s)) >= width.
+//
+//	stringutil.PadLeft("42", '0', 5) → "00042"
+func PadLeft(s string, padChar rune, width int) string {
+	runes := []rune(s)
+	if len(runes) >= width {
+		return s
+	}
+	padding := strings.Repeat(string(padChar), width-len(runes))
+	return padding + s
+}
+
+// PadRight pads s on the right with padChar until the string reaches width
+// runes. Returns s unchanged if len([]rune(s)) >= width.
+//
+//	stringutil.PadRight("hi", ' ', 5) → "hi   "
+func PadRight(s string, padChar rune, width int) string {
+	runes := []rune(s)
+	if len(runes) >= width {
+		return s
+	}
+	padding := strings.Repeat(string(padChar), width-len(runes))
+	return s + padding
+}
+
+// ---------------------------------------------------------------------------
+// Formatting
+// ---------------------------------------------------------------------------
+
+// Title capitalises the first rune of every whitespace-delimited word.
+// Does not use the deprecated strings.Title.
+//
+//	stringutil.Title("hello world") → "Hello World"
+func Title(s string) string {
+	words := strings.Fields(s)
+	for i, w := range words {
+		words[i] = capitalizeFirst(w)
+	}
+	return strings.Join(words, " ")
+}
+
+// Initials returns the uppercased first rune of each whitespace-delimited word.
+//
+//	stringutil.Initials("John Doe") → "JD"
+//	stringutil.Initials("budi santoso") → "BS"
+func Initials(s string) string {
+	words := strings.Fields(s)
+	result := strings.Builder{}
+	for _, w := range words {
+		runes := []rune(w)
+		if len(runes) > 0 {
+			result.WriteRune(unicode.ToUpper(runes[0]))
+		}
+	}
+	return result.String()
+}

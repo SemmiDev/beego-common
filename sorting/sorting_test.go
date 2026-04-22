@@ -176,3 +176,57 @@ func TestDateSortConfig(t *testing.T) {
 		})
 	})
 }
+
+// ---------------------------------------------------------------------------
+// Filter-aware convenience wrappers
+// ---------------------------------------------------------------------------
+
+func TestBuildOrderByClauseFromFilter(t *testing.T) {
+	Convey("Given BuildOrderByClauseFromFilter", t, func() {
+		cfg := sorting.NewSortConfig(map[string]string{
+			"name": "MS_USER_NAME",
+		}, "MS_USER_NAME")
+
+		Convey("When config is nil", func() {
+			So(sorting.BuildOrderByClauseFromFilter("name", "asc", nil), ShouldBeEmpty)
+		})
+
+		Convey("When valid sort fields are provided", func() {
+			clause := sorting.BuildOrderByClauseFromFilter("name", "desc", cfg)
+			So(clause, ShouldEqual, "[MS_USER_NAME] DESC")
+		})
+
+		Convey("When an invalid column is provided (SQL-injection attempt)", func() {
+			clause := sorting.BuildOrderByClauseFromFilter("evil; DROP TABLE users", "asc", cfg)
+			So(clause, ShouldEqual, "[MS_USER_NAME] ASC")
+		})
+
+		Convey("When sort fields are empty (uses default)", func() {
+			clause := sorting.BuildOrderByClauseFromFilter("", "", cfg)
+			So(clause, ShouldEqual, "[MS_USER_NAME] ASC")
+		})
+	})
+}
+
+func TestBuildFullOrderByClauseFromFilter(t *testing.T) {
+	Convey("Given BuildFullOrderByClauseFromFilter", t, func() {
+		cfg := sorting.NewSortConfig(map[string]string{
+			"name": "MS_USER_NAME",
+		}, "MS_USER_NAME")
+
+		Convey("When config is nil", func() {
+			So(sorting.BuildFullOrderByClauseFromFilter("name", "asc", nil), ShouldBeEmpty)
+		})
+
+		Convey("When valid sort fields are provided", func() {
+			clause := sorting.BuildFullOrderByClauseFromFilter("name", "desc", cfg)
+			So(clause, ShouldEqual, "ORDER BY [MS_USER_NAME] DESC")
+		})
+
+		Convey("When sort fields are empty (uses default)", func() {
+			clause := sorting.BuildFullOrderByClauseFromFilter("", "asc", cfg)
+			So(clause, ShouldEqual, "ORDER BY [MS_USER_NAME] ASC")
+		})
+	})
+}
+

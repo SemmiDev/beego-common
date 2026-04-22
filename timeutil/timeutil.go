@@ -212,3 +212,118 @@ func NowPtr() *time.Time {
 	now := time.Now()
 	return &now
 }
+
+// ---------------------------------------------------------------------------
+// Calendar
+// ---------------------------------------------------------------------------
+
+// StartOfYear returns the first instant of t's year (Jan 1 00:00:00) in t's location.
+func StartOfYear(t time.Time) time.Time {
+	return time.Date(t.Year(), time.January, 1, 0, 0, 0, 0, t.Location())
+}
+
+// EndOfYear returns the last instant of t's year (Dec 31 23:59:59.999999999) in t's location.
+func EndOfYear(t time.Time) time.Time {
+	return time.Date(t.Year(), time.December, 31, 23, 59, 59, int(time.Second-1), t.Location())
+}
+
+// Quarter returns the calendar quarter (1–4) for t.
+//
+//	timeutil.Quarter(time.Date(2026, time.May, 1, 0, 0, 0, 0, time.UTC)) → 2
+func Quarter(t time.Time) int {
+	return (int(t.Month())-1)/3 + 1
+}
+
+// WeekRange returns (monday, sunday) for the ISO week containing t.
+// Both returned times are at 00:00:00 in t's location.
+func WeekRange(t time.Time) (monday, sunday time.Time) {
+	weekday := int(t.Weekday())
+	if weekday == 0 {
+		weekday = 7 // Sunday → 7
+	}
+	monday = StartOfDay(t.AddDate(0, 0, -(weekday - 1)))
+	sunday = StartOfDay(t.AddDate(0, 0, 7-weekday))
+	return
+}
+
+// ---------------------------------------------------------------------------
+// Age & Duration
+// ---------------------------------------------------------------------------
+
+// Age returns the number of complete years from birthDate to today (UTC).
+func Age(birthDate time.Time) int {
+	return AgeAt(birthDate, time.Now().UTC())
+}
+
+// AgeAt returns the number of complete years from birthDate to ref.
+func AgeAt(birthDate, ref time.Time) int {
+	years := ref.Year() - birthDate.Year()
+	// Subtract 1 if the birthday hasn't occurred yet this year.
+	if ref.Month() < birthDate.Month() ||
+		(ref.Month() == birthDate.Month() && ref.Day() < birthDate.Day()) {
+		years--
+	}
+	if years < 0 {
+		return 0
+	}
+	return years
+}
+
+// FormatDurationIndonesian formats a duration as a human-readable Indonesian string.
+//
+//	timeutil.FormatDurationIndonesian(2*time.Hour + 15*time.Minute) → "2 jam 15 menit"
+//	timeutil.FormatDurationIndonesian(3 * 24 * time.Hour)           → "3 hari"
+func FormatDurationIndonesian(d time.Duration) string {
+	if d < 0 {
+		d = -d
+	}
+	days := int(d.Hours()) / 24
+	hours := int(d.Hours()) % 24
+	minutes := int(d.Minutes()) % 60
+	seconds := int(d.Seconds()) % 60
+
+	switch {
+	case days > 0 && hours > 0:
+		return fmt.Sprintf("%d hari %d jam", days, hours)
+	case days > 0:
+		return fmt.Sprintf("%d hari", days)
+	case hours > 0 && minutes > 0:
+		return fmt.Sprintf("%d jam %d menit", hours, minutes)
+	case hours > 0:
+		return fmt.Sprintf("%d jam", hours)
+	case minutes > 0 && seconds > 0:
+		return fmt.Sprintf("%d menit %d detik", minutes, seconds)
+	case minutes > 0:
+		return fmt.Sprintf("%d menit", minutes)
+	default:
+		return fmt.Sprintf("%d detik", seconds)
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Convenience (additional)
+// ---------------------------------------------------------------------------
+
+// ToPtr returns a pointer to t. Complement to the existing NowPtr.
+//
+//	ptr := timeutil.ToPtr(someTime)
+func ToPtr(t time.Time) *time.Time {
+	return &t
+}
+
+// ParseDateTimeMulti tries each layout in order and returns the first
+// successful parse. Returns an error if none of the layouts match.
+//
+//	t, err := timeutil.ParseDateTimeMulti(s,
+//	    "2006-01-02",
+//	    "2006-01-02 15:04:05",
+//	    time.RFC3339,
+//	)
+func ParseDateTimeMulti(s string, layouts ...string) (time.Time, error) {
+	for _, layout := range layouts {
+		if t, err := time.Parse(layout, s); err == nil {
+			return t, nil
+		}
+	}
+	return time.Time{}, fmt.Errorf("timeutil: %q does not match any of the provided layouts", s)
+}

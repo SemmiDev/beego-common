@@ -299,3 +299,164 @@ func TestNowPtr(t *testing.T) {
 		})
 	})
 }
+
+// ---------------------------------------------------------------------------
+// Calendar
+// ---------------------------------------------------------------------------
+
+func TestStartOfYear(t *testing.T) {
+	Convey("Given StartOfYear", t, func() {
+		result := timeutil.StartOfYear(referenceTime())
+		So(result.Month(), ShouldEqual, time.January)
+		So(result.Day(), ShouldEqual, 1)
+		So(result.Hour(), ShouldEqual, 0)
+		So(result.Year(), ShouldEqual, 2026)
+	})
+}
+
+func TestEndOfYear(t *testing.T) {
+	Convey("Given EndOfYear", t, func() {
+		result := timeutil.EndOfYear(referenceTime())
+		So(result.Month(), ShouldEqual, time.December)
+		So(result.Day(), ShouldEqual, 31)
+		So(result.Hour(), ShouldEqual, 23)
+	})
+}
+
+func TestQuarter(t *testing.T) {
+	Convey("Given Quarter", t, func() {
+		cases := []struct {
+			month    time.Month
+			expected int
+		}{
+			{time.January, 1},
+			{time.March, 1},
+			{time.April, 2},
+			{time.June, 2},
+			{time.July, 3},
+			{time.September, 3},
+			{time.October, 4},
+			{time.December, 4},
+		}
+		for _, tc := range cases {
+			tc := tc
+			Convey("Month "+tc.month.String()+" is Q"+string(rune('0'+tc.expected)), func() {
+				t := time.Date(2026, tc.month, 1, 0, 0, 0, 0, time.UTC)
+				So(timeutil.Quarter(t), ShouldEqual, tc.expected)
+			})
+		}
+	})
+}
+
+func TestWeekRange(t *testing.T) {
+	Convey("Given WeekRange", t, func() {
+		Convey("When date is a Wednesday", func() {
+			wednesday := time.Date(2026, time.April, 22, 12, 0, 0, 0, time.UTC) // Wed
+			monday, sunday := timeutil.WeekRange(wednesday)
+			So(monday.Weekday(), ShouldEqual, time.Monday)
+			So(sunday.Weekday(), ShouldEqual, time.Sunday)
+			So(monday.Day(), ShouldEqual, 20)
+			So(sunday.Day(), ShouldEqual, 26)
+		})
+
+		Convey("When date is a Sunday", func() {
+			sunday := time.Date(2026, time.April, 26, 0, 0, 0, 0, time.UTC) // Sun
+			monday, sun := timeutil.WeekRange(sunday)
+			So(monday.Day(), ShouldEqual, 20)
+			So(sun.Day(), ShouldEqual, 26)
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Age & Duration
+// ---------------------------------------------------------------------------
+
+func TestAgeAt(t *testing.T) {
+	Convey("Given AgeAt", t, func() {
+		birth := time.Date(1990, time.June, 15, 0, 0, 0, 0, time.UTC)
+
+		Convey("When birthday has passed this year", func() {
+			ref := time.Date(2026, time.July, 1, 0, 0, 0, 0, time.UTC)
+			So(timeutil.AgeAt(birth, ref), ShouldEqual, 36)
+		})
+
+		Convey("When birthday hasn't occurred yet this year", func() {
+			ref := time.Date(2026, time.May, 1, 0, 0, 0, 0, time.UTC)
+			So(timeutil.AgeAt(birth, ref), ShouldEqual, 35)
+		})
+
+		Convey("When ref is before birth", func() {
+			ref := time.Date(1989, time.January, 1, 0, 0, 0, 0, time.UTC)
+			So(timeutil.AgeAt(birth, ref), ShouldEqual, 0)
+		})
+	})
+}
+
+func TestFormatDurationIndonesian(t *testing.T) {
+	Convey("Given FormatDurationIndonesian", t, func() {
+		cases := []struct {
+			d    time.Duration
+			want string
+		}{
+			{3*24*time.Hour + 5*time.Hour, "3 hari 5 jam"},
+			{3 * 24 * time.Hour, "3 hari"},
+			{2*time.Hour + 15*time.Minute, "2 jam 15 menit"},
+			{2 * time.Hour, "2 jam"},
+			{30*time.Minute + 10*time.Second, "30 menit 10 detik"},
+			{30 * time.Minute, "30 menit"},
+			{45 * time.Second, "45 detik"},
+		}
+		for _, tc := range cases {
+			tc := tc
+			Convey("Duration "+tc.d.String(), func() {
+				So(timeutil.FormatDurationIndonesian(tc.d), ShouldEqual, tc.want)
+			})
+		}
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Convenience (additional)
+// ---------------------------------------------------------------------------
+
+func TestToPtr(t *testing.T) {
+	Convey("Given ToPtr", t, func() {
+		now := time.Now()
+		p := timeutil.ToPtr(now)
+		So(p, ShouldNotBeNil)
+		So(*p, ShouldEqual, now)
+	})
+}
+
+func TestParseDateTimeMulti(t *testing.T) {
+	Convey("Given ParseDateTimeMulti", t, func() {
+		Convey("When first layout matches", func() {
+			result, err := timeutil.ParseDateTimeMulti("2026-03-05",
+				"2006-01-02",
+				"2006-01-02 15:04:05",
+			)
+			So(err, ShouldBeNil)
+			So(result.Year(), ShouldEqual, 2026)
+			So(result.Month(), ShouldEqual, time.March)
+		})
+
+		Convey("When second layout matches", func() {
+			result, err := timeutil.ParseDateTimeMulti("2026-03-05 14:01:30",
+				"2006-01-02",
+				"2006-01-02 15:04:05",
+			)
+			So(err, ShouldBeNil)
+			So(result.Hour(), ShouldEqual, 14)
+		})
+
+		Convey("When no layout matches", func() {
+			_, err := timeutil.ParseDateTimeMulti("not-a-date",
+				"2006-01-02",
+				"2006-01-02 15:04:05",
+			)
+			So(err, ShouldNotBeNil)
+		})
+	})
+}
+

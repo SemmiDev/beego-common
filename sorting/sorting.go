@@ -188,3 +188,25 @@ func DateSortConfig(createDateCol, modifyDateCol, idCol string) *SortConfig {
 		"id":          idCol,
 	}, idCol)
 }
+
+// ---------------------------------------------------------------------------
+// Filter-aware convenience wrappers
+// ---------------------------------------------------------------------------
+
+// BuildOrderByClauseFromFilter builds a safe ORDER BY clause from the
+// SortBy and SortDirection strings taken directly from a pagination filter.
+// Nil-safe: when config is nil, returns empty string.
+//
+//	clause := sorting.BuildOrderByClauseFromFilter(f.SortBy, f.SortDirection, cfg)
+func BuildOrderByClauseFromFilter(sortBy, sortDirection string, config *SortConfig) string {
+	return BuildOrderByClause(sortBy, sortDirection, config)
+}
+
+// BuildFullOrderByClauseFromFilter builds a complete "ORDER BY ..." clause
+// from the SortBy and SortDirection strings taken directly from a pagination
+// filter. Nil-safe: when config is nil, returns empty string.
+//
+//	clause := sorting.BuildFullOrderByClauseFromFilter(f.SortBy, f.SortDirection, cfg)
+func BuildFullOrderByClauseFromFilter(sortBy, sortDirection string, config *SortConfig) string {
+	return BuildFullOrderByClause(sortBy, sortDirection, config)
+}

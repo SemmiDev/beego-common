@@ -185,3 +185,131 @@ func TestReverse(t *testing.T) {
 		})
 	})
 }
+
+// ---------------------------------------------------------------------------
+// Case conversion (additional)
+// ---------------------------------------------------------------------------
+
+func TestToCamelCase(t *testing.T) {
+	Convey("Given ToCamelCase", t, func() {
+		Convey("When input is snake_case", func() {
+			So(stringutil.ToCamelCase("hello_world"), ShouldEqual, "helloWorld")
+		})
+
+		Convey("When input is kebab-case", func() {
+			So(stringutil.ToCamelCase("my-field-name"), ShouldEqual, "myFieldName")
+		})
+
+		Convey("When input is a single word", func() {
+			So(stringutil.ToCamelCase("hello"), ShouldEqual, "hello")
+		})
+	})
+}
+
+func TestToPascalCase(t *testing.T) {
+	Convey("Given ToPascalCase", t, func() {
+		Convey("When input is snake_case", func() {
+			So(stringutil.ToPascalCase("hello_world"), ShouldEqual, "HelloWorld")
+		})
+
+		Convey("When input is kebab-case", func() {
+			So(stringutil.ToPascalCase("my-field"), ShouldEqual, "MyField")
+		})
+
+		Convey("When input is a single word", func() {
+			So(stringutil.ToPascalCase("hello"), ShouldEqual, "Hello")
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Checks
+// ---------------------------------------------------------------------------
+
+func TestStringIsEmpty(t *testing.T) {
+	Convey("Given IsEmpty", t, func() {
+		So(stringutil.IsEmpty(""), ShouldBeTrue)
+		So(stringutil.IsEmpty("   "), ShouldBeTrue)
+		So(stringutil.IsEmpty("a"), ShouldBeFalse)
+	})
+}
+
+func TestIsBlank(t *testing.T) {
+	Convey("Given IsBlank (alias for IsEmpty)", t, func() {
+		So(stringutil.IsBlank(""), ShouldBeTrue)
+		So(stringutil.IsBlank("  "), ShouldBeTrue)
+		So(stringutil.IsBlank("x"), ShouldBeFalse)
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Splitting
+// ---------------------------------------------------------------------------
+
+func TestSplitTrim(t *testing.T) {
+	Convey("Given SplitTrim", t, func() {
+		Convey("When parts have surrounding spaces", func() {
+			result := stringutil.SplitTrim("a , b ,, c", ",")
+			So(result, ShouldResemble, []string{"a", "b", "c"})
+		})
+
+		Convey("When all parts are empty after trim", func() {
+			result := stringutil.SplitTrim(",,", ",")
+			So(result, ShouldBeEmpty)
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Padding
+// ---------------------------------------------------------------------------
+
+func TestPadLeft(t *testing.T) {
+	Convey("Given PadLeft", t, func() {
+		Convey("When s is shorter than width", func() {
+			So(stringutil.PadLeft("42", '0', 5), ShouldEqual, "00042")
+		})
+
+		Convey("When s is exactly width", func() {
+			So(stringutil.PadLeft("hello", ' ', 5), ShouldEqual, "hello")
+		})
+
+		Convey("When s is longer than width", func() {
+			So(stringutil.PadLeft("toolong", ' ', 3), ShouldEqual, "toolong")
+		})
+	})
+}
+
+func TestPadRight(t *testing.T) {
+	Convey("Given PadRight", t, func() {
+		Convey("When s is shorter than width", func() {
+			So(stringutil.PadRight("hi", ' ', 5), ShouldEqual, "hi   ")
+		})
+
+		Convey("When s is exactly width", func() {
+			So(stringutil.PadRight("hello", ' ', 5), ShouldEqual, "hello")
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Formatting
+// ---------------------------------------------------------------------------
+
+func TestTitle(t *testing.T) {
+	Convey("Given Title", t, func() {
+		So(stringutil.Title("hello world"), ShouldEqual, "Hello World")
+		So(stringutil.Title("go is great"), ShouldEqual, "Go Is Great")
+		So(stringutil.Title(""), ShouldEqual, "")
+	})
+}
+
+func TestInitials(t *testing.T) {
+	Convey("Given Initials", t, func() {
+		So(stringutil.Initials("John Doe"), ShouldEqual, "JD")
+		So(stringutil.Initials("budi santoso"), ShouldEqual, "BS")
+		So(stringutil.Initials("single"), ShouldEqual, "S")
+		So(stringutil.Initials(""), ShouldEqual, "")
+	})
+}
+

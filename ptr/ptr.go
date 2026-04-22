@@ -131,3 +131,88 @@ func ValueOrDefault[T any](p *T, defaultVal T) T {
 func IsNilOrEmpty(p *string) bool {
 	return p == nil || *p == ""
 }
+
+// ---------------------------------------------------------------------------
+// Value → Pointer (additional numeric types)
+// ---------------------------------------------------------------------------
+
+// Uint returns a pointer to the given uint value.
+func Uint(v uint) *uint { return &v }
+
+// Uint32 returns a pointer to the given uint32 value.
+func Uint32(v uint32) *uint32 { return &v }
+
+// Uint64 returns a pointer to the given uint64 value.
+func Uint64(v uint64) *uint64 { return &v }
+
+// Int8 returns a pointer to the given int8 value.
+func Int8(v int8) *int8 { return &v }
+
+// Int16 returns a pointer to the given int16 value.
+func Int16(v int16) *int16 { return &v }
+
+// Byte returns a pointer to the given byte value.
+func Byte(v byte) *byte { return &v }
+
+// Rune returns a pointer to the given rune value.
+func Rune(v rune) *rune { return &v }
+
+// ---------------------------------------------------------------------------
+// Pointer → Value (additional types)
+// ---------------------------------------------------------------------------
+
+// Int32Value returns the value pointed to by p, or 0 if p is nil.
+func Int32Value(p *int32) int32 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// Float32Value returns the value pointed to by p, or 0 if p is nil.
+func Float32Value(p *float32) float32 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// UintValue returns the value pointed to by p, or 0 if p is nil.
+func UintValue(p *uint) uint {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// Uint32Value returns the value pointed to by p, or 0 if p is nil.
+func Uint32Value(p *uint32) uint32 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// Uint64Value returns the value pointed to by p, or 0 if p is nil.
+func Uint64Value(p *uint64) uint64 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// Int8Value returns the value pointed to by p, or 0 if p is nil.
+func Int8Value(p *int8) int8 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}
+
+// Int16Value returns the value pointed to by p, or 0 if p is nil.
+func Int16Value(p *int16) int16 {
+	if p != nil {
+		return *p
+	}
+	return 0
+}

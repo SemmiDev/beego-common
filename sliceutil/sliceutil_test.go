@@ -289,3 +289,212 @@ func TestIsEmpty(t *testing.T) {
 		So(sliceutil.IsEmpty([]int{1}), ShouldBeFalse)
 	})
 }
+
+// ---------------------------------------------------------------------------
+// Access
+// ---------------------------------------------------------------------------
+
+func TestFirst(t *testing.T) {
+	Convey("Given First", t, func() {
+		Convey("When slice has elements", func() {
+			v, ok := sliceutil.First([]int{10, 20, 30})
+			So(ok, ShouldBeTrue)
+			So(v, ShouldEqual, 10)
+		})
+
+		Convey("When slice is empty", func() {
+			v, ok := sliceutil.First([]int{})
+			So(ok, ShouldBeFalse)
+			So(v, ShouldEqual, 0)
+		})
+
+		Convey("When slice is nil", func() {
+			v, ok := sliceutil.First[string](nil)
+			So(ok, ShouldBeFalse)
+			So(v, ShouldBeEmpty)
+		})
+	})
+}
+
+func TestLast(t *testing.T) {
+	Convey("Given Last", t, func() {
+		Convey("When slice has elements", func() {
+			v, ok := sliceutil.Last([]int{10, 20, 30})
+			So(ok, ShouldBeTrue)
+			So(v, ShouldEqual, 30)
+		})
+
+		Convey("When slice is empty", func() {
+			_, ok := sliceutil.Last([]int{})
+			So(ok, ShouldBeFalse)
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Predicates
+// ---------------------------------------------------------------------------
+
+func TestAny(t *testing.T) {
+	Convey("Given Any", t, func() {
+		Convey("When at least one element matches", func() {
+			So(sliceutil.Any([]int{1, 2, 3}, func(n int) bool { return n > 2 }), ShouldBeTrue)
+		})
+
+		Convey("When no element matches", func() {
+			So(sliceutil.Any([]int{1, 2, 3}, func(n int) bool { return n > 10 }), ShouldBeFalse)
+		})
+
+		Convey("When slice is empty", func() {
+			So(sliceutil.Any([]int{}, func(n int) bool { return true }), ShouldBeFalse)
+		})
+	})
+}
+
+func TestAll(t *testing.T) {
+	Convey("Given All", t, func() {
+		Convey("When all elements match", func() {
+			So(sliceutil.All([]int{2, 4, 6}, func(n int) bool { return n%2 == 0 }), ShouldBeTrue)
+		})
+
+		Convey("When one element does not match", func() {
+			So(sliceutil.All([]int{2, 3, 6}, func(n int) bool { return n%2 == 0 }), ShouldBeFalse)
+		})
+
+		Convey("When slice is empty (vacuously true)", func() {
+			So(sliceutil.All([]int{}, func(n int) bool { return false }), ShouldBeTrue)
+		})
+	})
+}
+
+func TestNone(t *testing.T) {
+	Convey("Given None", t, func() {
+		Convey("When no element matches", func() {
+			So(sliceutil.None([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 }), ShouldBeTrue)
+		})
+
+		Convey("When one element matches", func() {
+			So(sliceutil.None([]int{1, 2, 3}, func(n int) bool { return n%2 == 0 }), ShouldBeFalse)
+		})
+
+		Convey("When slice is empty (vacuously true)", func() {
+			So(sliceutil.None([]int{}, func(n int) bool { return true }), ShouldBeTrue)
+		})
+	})
+}
+
+func TestCount(t *testing.T) {
+	Convey("Given Count", t, func() {
+		Convey("When multiple elements match", func() {
+			n := sliceutil.Count([]int{1, 2, 3, 4, 5}, func(n int) bool { return n%2 == 0 })
+			So(n, ShouldEqual, 2)
+		})
+
+		Convey("When no elements match", func() {
+			n := sliceutil.Count([]int{1, 3, 5}, func(n int) bool { return n%2 == 0 })
+			So(n, ShouldEqual, 0)
+		})
+	})
+}
+
+// ---------------------------------------------------------------------------
+// Reshaping
+// ---------------------------------------------------------------------------
+
+func TestReverse(t *testing.T) {
+	Convey("Given Reverse", t, func() {
+		Convey("When slice has multiple elements", func() {
+			result := sliceutil.Reverse([]int{1, 2, 3})
+			So(result, ShouldResemble, []int{3, 2, 1})
+		})
+
+		Convey("When original is not mutated", func() {
+			orig := []int{1, 2, 3}
+			_ = sliceutil.Reverse(orig)
+			So(orig, ShouldResemble, []int{1, 2, 3})
+		})
+
+		Convey("When slice is nil", func() {
+			So(sliceutil.Reverse[int](nil), ShouldBeNil)
+		})
+	})
+}
+
+func TestFlatten(t *testing.T) {
+	Convey("Given Flatten", t, func() {
+		Convey("When nested slices are provided", func() {
+			result := sliceutil.Flatten([][]int{{1, 2}, {3}, {4, 5}})
+			So(result, ShouldResemble, []int{1, 2, 3, 4, 5})
+		})
+
+		Convey("When outer slice is empty", func() {
+			result := sliceutil.Flatten([][]int{})
+			So(result, ShouldBeNil)
+		})
+	})
+}
+
+func TestCompact(t *testing.T) {
+	Convey("Given Compact", t, func() {
+		Convey("When slice has zero-value strings", func() {
+			result := sliceutil.Compact([]string{"a", "", "b", ""})
+			So(result, ShouldResemble, []string{"a", "b"})
+		})
+
+		Convey("When slice has zero-value ints", func() {
+			result := sliceutil.Compact([]int{1, 0, 2, 0, 3})
+			So(result, ShouldResemble, []int{1, 2, 3})
+		})
+
+		Convey("When no zero values exist", func() {
+			result := sliceutil.Compact([]int{1, 2, 3})
+			So(result, ShouldResemble, []int{1, 2, 3})
+		})
+	})
+}
+
+func TestTake(t *testing.T) {
+	Convey("Given Take", t, func() {
+		Convey("When n is less than len", func() {
+			result := sliceutil.Take([]int{1, 2, 3, 4, 5}, 3)
+			So(result, ShouldResemble, []int{1, 2, 3})
+		})
+
+		Convey("When n equals len", func() {
+			result := sliceutil.Take([]int{1, 2, 3}, 3)
+			So(result, ShouldResemble, []int{1, 2, 3})
+		})
+
+		Convey("When n exceeds len", func() {
+			result := sliceutil.Take([]int{1, 2}, 10)
+			So(result, ShouldResemble, []int{1, 2})
+		})
+
+		Convey("When n is 0", func() {
+			So(sliceutil.Take([]int{1, 2, 3}, 0), ShouldBeNil)
+		})
+	})
+}
+
+func TestSkip(t *testing.T) {
+	Convey("Given Skip", t, func() {
+		Convey("When n is less than len", func() {
+			result := sliceutil.Skip([]int{1, 2, 3, 4, 5}, 2)
+			So(result, ShouldResemble, []int{3, 4, 5})
+		})
+
+		Convey("When n equals len", func() {
+			So(sliceutil.Skip([]int{1, 2, 3}, 3), ShouldBeNil)
+		})
+
+		Convey("When n exceeds len", func() {
+			So(sliceutil.Skip([]int{1, 2}, 10), ShouldBeNil)
+		})
+
+		Convey("When n is 0", func() {
+			result := sliceutil.Skip([]int{1, 2, 3}, 0)
+			So(result, ShouldResemble, []int{1, 2, 3})
+		})
+	})
+}
+

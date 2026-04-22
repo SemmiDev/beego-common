@@ -229,3 +229,166 @@ func Values[K comparable, V any](m map[K]V) []V {
 func IsEmpty[T any](src []T) bool {
 	return len(src) == 0
 }
+
+// ---------------------------------------------------------------------------
+// Access
+// ---------------------------------------------------------------------------
+
+// First returns the first element of src and true.
+// Returns the zero value and false when src is nil or empty.
+//
+//	v, ok := sliceutil.First(items)
+func First[T any](src []T) (T, bool) {
+	if len(src) == 0 {
+		var zero T
+		return zero, false
+	}
+	return src[0], true
+}
+
+// Last returns the last element of src and true.
+// Returns the zero value and false when src is nil or empty.
+//
+//	v, ok := sliceutil.Last(items)
+func Last[T any](src []T) (T, bool) {
+	if len(src) == 0 {
+		var zero T
+		return zero, false
+	}
+	return src[len(src)-1], true
+}
+
+// ---------------------------------------------------------------------------
+// Predicates
+// ---------------------------------------------------------------------------
+
+// Any reports whether at least one element satisfies fn.
+// Returns false for a nil or empty slice.
+//
+//	sliceutil.Any(items, func(i Item) bool { return i.Active })
+func Any[T any](src []T, fn func(T) bool) bool {
+	for _, v := range src {
+		if fn(v) {
+			return true
+		}
+	}
+	return false
+}
+
+// All reports whether every element satisfies fn.
+// Returns true vacuously for a nil or empty slice.
+//
+//	sliceutil.All(items, func(i Item) bool { return i.Active })
+func All[T any](src []T, fn func(T) bool) bool {
+	for _, v := range src {
+		if !fn(v) {
+			return false
+		}
+	}
+	return true
+}
+
+// None reports whether no element satisfies fn.
+// Returns true vacuously for a nil or empty slice.
+//
+//	sliceutil.None(items, func(i Item) bool { return i.Deleted })
+func None[T any](src []T, fn func(T) bool) bool {
+	for _, v := range src {
+		if fn(v) {
+			return false
+		}
+	}
+	return true
+}
+
+// Count returns the number of elements that satisfy fn.
+//
+//	n := sliceutil.Count(items, func(i Item) bool { return i.Active })
+func Count[T any](src []T, fn func(T) bool) int {
+	n := 0
+	for _, v := range src {
+		if fn(v) {
+			n++
+		}
+	}
+	return n
+}
+
+// ---------------------------------------------------------------------------
+// Reshaping
+// ---------------------------------------------------------------------------
+
+// Reverse returns a reversed copy of src. The original slice is never mutated.
+//
+//	sliceutil.Reverse([]int{1, 2, 3}) // [3, 2, 1]
+func Reverse[T any](src []T) []T {
+	if src == nil {
+		return nil
+	}
+	result := make([]T, len(src))
+	for i, v := range src {
+		result[len(src)-1-i] = v
+	}
+	return result
+}
+
+// Flatten collapses a [][]T into a []T.
+//
+//	sliceutil.Flatten([][]int{{1, 2}, {3}}) // [1, 2, 3]
+func Flatten[T any](src [][]T) []T {
+	var result []T
+	for _, inner := range src {
+		result = append(result, inner...)
+	}
+	return result
+}
+
+// Compact removes zero-value elements from src using generic equality.
+//
+//	sliceutil.Compact([]string{"a", "", "b", ""}) // ["a", "b"]
+func Compact[T comparable](src []T) []T {
+	var zero T
+	var result []T
+	for _, v := range src {
+		if v != zero {
+			result = append(result, v)
+		}
+	}
+	return result
+}
+
+// Take returns the first n elements of src.
+// Safe when n >= len(src) — returns a copy of the whole slice.
+//
+//	sliceutil.Take([]int{1, 2, 3, 4, 5}, 3) // [1, 2, 3]
+func Take[T any](src []T, n int) []T {
+	if n <= 0 || len(src) == 0 {
+		return nil
+	}
+	if n >= len(src) {
+		result := make([]T, len(src))
+		copy(result, src)
+		return result
+	}
+	result := make([]T, n)
+	copy(result, src[:n])
+	return result
+}
+
+// Skip drops the first n elements and returns the rest.
+// Safe when n >= len(src) — returns nil.
+//
+//	sliceutil.Skip([]int{1, 2, 3, 4, 5}, 2) // [3, 4, 5]
+func Skip[T any](src []T, n int) []T {
+	if n <= 0 {
+		result := make([]T, len(src))
+		copy(result, src)
+		return result
+	}
+	if n >= len(src) {
+		return nil
+	}
+	result := make([]T, len(src)-n)
+	copy(result, src[n:])
+	return result
+}

@@ -6,7 +6,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/netutil"
+	"github.com/semmidev/beego-common/netutil"
 )
 
 func TestMustGetIP(t *testing.T) {

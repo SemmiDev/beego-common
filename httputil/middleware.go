@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 
 	"github.com/google/uuid"
-	"github.com/semmidev/bee-go-kit/apperror"
+	"github.com/semmidev/beego-common/apperror"
 )
 
 // ---------------------------------------------------------------------------

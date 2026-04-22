@@ -1,32 +1,32 @@
-# 🐝 bee-go-kit
+# 🐝 beego-common
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/semmidev/bee-go-kit.svg)](https://pkg.go.dev/github.com/semmidev/bee-go-kit)
+[![Go Reference](https://pkg.go.dev/badge/github.com/semmidev/beego-common.svg)](https://pkg.go.dev/github.com/semmidev/beego-common)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A curated, highly-extensible collection of reusable Go packages extracted from production API services. Each package is self-contained, framework-agnostic, and designed following SOLID principles.
 
-`bee-go-kit` provides a robust foundation for building modern web APIs in Go, offering structured error handling, standardized responses, pagination, safe sorting, composable sanitization, and pre-configured validation with Indonesian (Bahasa Indonesia) translations.
+`beego-common` provides a robust foundation for building modern web APIs in Go, offering structured error handling, standardized responses, pagination, safe sorting, composable sanitization, and pre-configured validation with Indonesian (Bahasa Indonesia) translations.
 
 ---
 
 ## 📦 Installation
 
 ```bash
-go get github.com/semmidev/bee-go-kit
+go get github.com/semmidev/beego-common
 ```
 
 ---
 
 ## 🚀 Core Packages: Usage & Extensibility
 
-Every package in `bee-go-kit` is designed to be highly extensible. You can completely customize the behavior without forking the repository.
+Every package in `beego-common` is designed to be highly extensible. You can completely customize the behavior without forking the repository.
 
 ### 1. `validate` (Flexible Struct Validation)
 A pre-configured struct validator using `go-playground/validator/v10` with Indonesian error messages.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/validate"
+import "github.com/semmidev/beego-common/validate"
 
 validate.Init() // Call once at app startup
 
@@ -62,7 +62,7 @@ Structured HTTP errors mapped to stable, machine-readable error codes.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/apperror"
+import "github.com/semmidev/beego-common/apperror"
 
 // Built-in constructors
 err := apperror.NotFound("User not found")
@@ -91,7 +91,7 @@ Standardized JSON responses and middleware.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/httputil"
+import "github.com/semmidev/beego-common/httputil"
 
 // 1. Success response (200 OK)
 httputil.WriteSuccess(w, http.StatusOK, "User created", userObj)
@@ -116,7 +116,7 @@ httputil.SetErrorTransformer(func(err error) (int, httputil.Response) {
             Message:   myErr.Message,
         }
     }
-    // Return 0 to fall back to the default bee-go-kit error handling
+    // Return 0 to fall back to the default beego-common error handling
     return 0, httputil.Response{}
 })
 ```
@@ -126,7 +126,7 @@ Extracts array/list parameters safely from HTTP requests.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/pagination"
+import "github.com/semmidev/beego-common/pagination"
 
 // Parses params like ?page=2&per_page=20&keyword=john
 filter := pagination.FilterFromRequest(r)
@@ -158,7 +158,7 @@ Prevents SQL injection when binding user inputs to `ORDER BY` clauses.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/sorting"
+import "github.com/semmidev/beego-common/sorting"
 
 // Whitelist mapping (Frontend Sort Key -> Actual DB Column)
 cfg := sorting.NewSortConfig(map[string]string{
@@ -187,7 +187,7 @@ Prevent XSS, Path Traversal, and SQL injection.
 
 **Basic Usage:**
 ```go
-import "github.com/semmidev/bee-go-kit/sanitize"
+import "github.com/semmidev/beego-common/sanitize"
 
 safeHTML := sanitize.String("<script>alert(1)</script>") // Escapes HTML
 safeLike := sanitize.ForSQLLike("100%")                 // Escapes % to [%] for SQL LIKE
@@ -198,7 +198,7 @@ safeFile := sanitize.Filename("../../../etc/passwd")    // -> etcpasswd
 **Extending / Customizing:**
 ```go
 // Build powerful, composable sanitization pipelines that merge
-// bee-go-kit's sanitizers with your own custom logic!
+// beego-common's sanitizers with your own custom logic!
 myPipeline := sanitize.Chain(
     sanitize.StringNoEscape,                                     // 1. Trim whitespace
     strings.ToLower,                                             // 2. Make lowercase

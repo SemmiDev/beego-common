@@ -8,7 +8,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/apperror"
+	"github.com/semmidev/beego-common/apperror"
 )
 
 // ---------------------------------------------------------------------------

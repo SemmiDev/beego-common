@@ -32,7 +32,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/semmidev/bee-go-kit/storage"
+	"github.com/semmidev/beego-common/storage"
 )
 
 // ---------------------------------------------------------------------------

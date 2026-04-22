@@ -6,7 +6,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/timeutil"
+	"github.com/semmidev/beego-common/timeutil"
 )
 
 // referenceTime creates a fixed time for deterministic tests.

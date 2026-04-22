@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/semmidev/bee-go-kit/apperror"
+	"github.com/semmidev/beego-common/apperror"
 )
 
 // ---------------------------------------------------------------------------

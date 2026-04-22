@@ -7,7 +7,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/dbx"
+	"github.com/semmidev/beego-common/dbx"
 )
 
 // ---------------------------------------------------------------------------

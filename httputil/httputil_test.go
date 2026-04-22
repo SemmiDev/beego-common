@@ -9,9 +9,9 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/apperror"
-	"github.com/semmidev/bee-go-kit/httputil"
-	"github.com/semmidev/bee-go-kit/pagination"
+	"github.com/semmidev/beego-common/apperror"
+	"github.com/semmidev/beego-common/httputil"
+	"github.com/semmidev/beego-common/pagination"
 )
 
 // ---------------------------------------------------------------------------

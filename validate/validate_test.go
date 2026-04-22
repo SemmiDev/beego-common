@@ -6,7 +6,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/semmidev/bee-go-kit/validate"
+	"github.com/semmidev/beego-common/validate"
 )
 
 // ---------------------------------------------------------------------------

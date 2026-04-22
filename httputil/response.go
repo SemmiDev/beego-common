@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/semmidev/bee-go-kit/apperror"
-	"github.com/semmidev/bee-go-kit/pagination"
+	"github.com/semmidev/beego-common/apperror"
+	"github.com/semmidev/beego-common/pagination"
 )
 
 // ---------------------------------------------------------------------------

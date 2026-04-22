@@ -1,4 +1,4 @@
-module github.com/semmidev/bee-go-kit
+module github.com/semmidev/beego-common
 
 go 1.26.0
 

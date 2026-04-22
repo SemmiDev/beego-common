@@ -5,7 +5,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/semmidev/bee-go-kit/sliceutil"
+	"github.com/semmidev/beego-common/sliceutil"
 )
 
 // ---------------------------------------------------------------------------
